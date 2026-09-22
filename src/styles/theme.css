@@ -19,16 +19,6 @@
 .brand {
   color: var(--ink);
 }
-.brand-mark {
-  background: var(--accent);
-  box-shadow: 0 4px 10px #2563eb25;
-  transform: none;
-}
-.brand-mark i:nth-child(2),
-.brand-mark i:nth-child(3) {
-  background: #62eed3;
-  opacity: 1;
-}
 .main-nav {
   background: #f0f5fb;
   padding: 4px;
@@ -542,9 +532,6 @@ input[type='range']::-moz-range-thumb {
 .footer-links > span {
   color: #52687f;
 }
-.site-footer .brand-mark {
-  background: #3174df;
-}
 .footer-links > span svg {
   color: #e76565;
 }
@@ -736,7 +723,7 @@ select:focus-visible,
     gap: 10px;
   }
   .brand {
-    font-size: 21px;
+    font-size: 19px;
   }
   .main-nav {
     padding: 3px;

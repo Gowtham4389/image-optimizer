@@ -188,7 +188,7 @@ export default function BatchOptimizer({ formats }: { formats: Format[] }) {
       if (live.current)
         downloadBlob(
           new Blob([zipped.buffer as ArrayBuffer], { type: 'application/zip' }),
-          'pixelwell-optimized.zip',
+          'pixelchange-optimized.zip',
         )
     } catch {
       if (live.current)

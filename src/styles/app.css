@@ -154,30 +154,24 @@ fieldset:disabled {
   align-items: center;
   gap: 10px;
   font-size: 24px;
-  font-weight: 720;
-  letter-spacing: -1.1px;
+  font-weight: 750;
+  letter-spacing: -0.9px;
+  white-space: nowrap;
 }
-.brand-period {
-  color: var(--accent);
+.brand-change {
+  color: #6554d6;
+  font-weight: 650;
 }
 .brand-mark {
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
-  background: var(--accent);
-  padding: 8px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3px;
-  transform: rotate(-3deg);
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: inline-flex;
 }
-.brand-mark i {
-  background: white;
-  border-radius: 1.5px;
-}
-.brand-mark i:nth-child(2),
-.brand-mark i:nth-child(3) {
-  opacity: 0.55;
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 .main-nav {
   display: flex;
@@ -1137,15 +1131,8 @@ input[type='range']:disabled {
   letter-spacing: -0.7px;
 }
 .site-footer .brand-mark {
-  width: 19px;
-  height: 19px;
-  padding: 5px;
-  gap: 2px;
-  border-radius: 5px;
-  background: #a595bd;
-}
-.site-footer .brand-mark i {
-  border-radius: 0.5px;
+  width: 26px;
+  height: 26px;
 }
 .site-footer > div:first-child > span:last-child {
   font-size: 12px;
@@ -2404,11 +2391,8 @@ input.comparison-range:focus-visible {
     gap: 7px;
   }
   .brand-mark {
-    width: 28px;
-    height: 28px;
-    padding: 7px;
-    gap: 3px;
-    border-radius: 8px;
+    width: 32px;
+    height: 32px;
   }
   .main-nav > button {
     font-size: 14px;

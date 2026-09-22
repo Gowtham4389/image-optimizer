@@ -1,4 +1,4 @@
-# Pixelwell — Image Optimizer
+# PixelChange — Image Optimizer
 
 A private, static image editor built with React, TypeScript, Vite, and browser image APIs. Upload, paste, crop, resize, adjust, compress, convert, compare, and download images without sending them to a server. A separate batch workspace processes collections and exports ZIP files.
 
@@ -30,13 +30,13 @@ Vite uses `base: './'` so assets work under the domain root or a subdirectory. T
 
 ### Standard / shared hosting, Apache, Nginx
 
-Upload **the contents of `dist/`** to your web directory, such as `public_html/` or `public_html/pixelwell/`. Keep the generated `assets/` folder intact. Serve `.js` as JavaScript, `.css` as CSS, and `.wasm` as `application/wasm`. Keep the generated EPS engine assets (about 15.5 MB uncompressed) and `licenses/` directory intact. HTTPS is recommended.
+Upload **the contents of `dist/`** to your web directory, such as `public_html/` or `public_html/pixelchange/`. Keep the generated `assets/` folder intact. Serve `.js` as JavaScript, `.css` as CSS, and `.wasm` as `application/wasm`. Keep the generated EPS engine assets (about 15.5 MB uncompressed) and `licenses/` directory intact. HTTPS is recommended.
 
 A minimal Nginx location is:
 
 ```nginx
 location / {
-    root /var/www/pixelwell;
+    root /var/www/pixelchange;
     index index.html;
     try_files $uri $uri/ =404;
 }

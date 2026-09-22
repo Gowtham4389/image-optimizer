@@ -99,6 +99,52 @@ for (const fallback of [false, true]) {
   })
 }
 
+test('device previews switch screens without changing the export and follow edits', async ({
+  page,
+}) => {
+  await ready(page)
+  await uploadTransparent(page)
+  const first = await save(page)
+  const originalExport = await readFile((await first.path())!)
+  const preview = page.getByRole('region', { name: 'Device preview', exact: true })
+  for (const device of ['Desktop', 'Tablet', 'Mobile']) {
+    const button = page.getByRole('button', { name: `${device} preview`, exact: true })
+    await button.click()
+    await expect(button).toHaveAttribute('aria-pressed', 'true')
+    await expect(preview.getByRole('img')).toHaveAttribute(
+      'alt',
+      `Optimized image in ${device.toLowerCase()} preview`,
+    )
+    await expect(preview.locator('.device-frame')).toHaveClass(
+      `device-frame device-frame--${device.toLowerCase()}`,
+    )
+  }
+  const after = await save(page)
+  expect(await readFile((await after.path())!)).toEqual(originalExport)
+  await page.getByRole('button', { name: 'Original', exact: true }).click()
+  await expect(preview.getByRole('img')).toHaveAttribute(
+    'src',
+    (await page.getByAltText('Original uploaded image').getAttribute('src'))!,
+  )
+  await page.getByRole('button', { name: 'Optimized', exact: true }).click()
+  await page.getByRole('tab', { name: 'Resize', exact: true }).click()
+  const width = page.getByRole('spinbutton', { name: 'Width', exact: true })
+  await width.fill('60')
+  await width.press('Tab')
+  await expect(page.getByRole('button', { name: /^Download image/ })).toBeEnabled()
+  await expect(preview.getByRole('img')).toHaveAttribute(
+    'src',
+    (await page.getByAltText('Optimized image preview', { exact: true }).getAttribute('src'))!,
+  )
+  await expect
+    .poll(() => preview.getByRole('img').evaluate((img: HTMLImageElement) => img.naturalWidth))
+    .toBe(60)
+  await page.getByRole('button', { name: 'Expand preview', exact: true }).click()
+  await expect(preview).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.workspace-card')).not.toHaveClass(/is-expanded/)
+})
+
 test('resize preserves proportions, undo/redo and customizable filename', async ({ page }) => {
   await ready(page)
   await page.getByRole('tab', { name: 'Resize', exact: true }).click()
@@ -189,7 +235,7 @@ test('batch outputs and ZIP with duplicate filenames', async ({ page }) => {
   const dl = page.waitForEvent('download')
   await page.getByRole('button', { name: 'Download all as ZIP' }).click()
   const downloaded = await dl
-  expect(downloaded.suggestedFilename()).toBe('pixelwell-optimized.zip')
+  expect(downloaded.suggestedFilename()).toBe('pixelchange-optimized.zip')
   const { unzipSync } = await import('fflate')
   const zip = unzipSync(new Uint8Array(await readFile((await downloaded.path())!)))
   expect(Object.keys(zip)).toHaveLength(2)

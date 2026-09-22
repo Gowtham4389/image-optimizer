@@ -16,12 +16,12 @@ test('production assets, worker, crop chunk, and downloads work under a subdirec
   const server = createServer(async (request, response) => {
     try {
       const pathname = new URL(request.url!, 'http://localhost').pathname
-      if (!pathname.startsWith('/tools/pixelwell/')) {
+      if (!pathname.startsWith('/tools/pixelchange/')) {
         response.writeHead(404)
         response.end()
         return
       }
-      const relative = pathname.slice('/tools/pixelwell/'.length) || 'index.html'
+      const relative = pathname.slice('/tools/pixelchange/'.length) || 'index.html'
       const resolved = path.resolve(root, relative)
       if (!resolved.startsWith(root + path.sep)) {
         response.writeHead(403)
@@ -57,7 +57,7 @@ test('production assets, worker, crop chunk, and downloads work under a subdirec
     page.on('response', (r) => {
       if (r.status() >= 400) failed.push(r.url())
     })
-    await page.goto(`http://127.0.0.1:${address.port}/tools/pixelwell/`)
+    await page.goto(`http://127.0.0.1:${address.port}/tools/pixelchange/`)
     await expect(page.getByRole('button', { name: /^Download image/ })).toBeEnabled()
     await page.getByRole('tab', { name: 'Crop', exact: true }).click()
     await page.getByRole('button', { name: 'Open crop editor' }).click()

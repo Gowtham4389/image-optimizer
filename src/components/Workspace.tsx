@@ -18,6 +18,7 @@ import {
   X,
 } from 'lucide-react'
 import type { Editor } from '../hooks/useEditor'
+import { DevicePreview } from './DevicePreview'
 import { downloadBlob, extension, formatBytes, outputName } from '../utils/files'
 
 export function EmptyWorkspace({ onChoose }: { onChoose: () => void }) {
@@ -98,205 +99,218 @@ export function Workspace({
           </button>
         )}
       </div>
-      <div className="preview-container">
-        <div className="preview-topbar">
-          <div className="view-switch" role="group" aria-label="Preview mode">
-            {(['original', 'optimized', 'compare'] as const).map((v) => (
-              <button
-                key={v}
-                className={view === v ? 'selected' : ''}
-                onClick={() => setView(v)}
-                disabled={v !== 'original' && !output}
-              >
-                {v[0].toUpperCase() + v.slice(1)}
-                {v === 'optimized' && <span className="status-dot" />}
-              </button>
-            ))}
-          </div>
-          <span className="preview-status">
-            {processing ? (
-              <>
-                <LoaderCircle size={13} className="spin" />
-                Optimizing
-              </>
-            ) : (
-              <>
-                <Check size={13} />
-                Ready to go
-              </>
-            )}
-          </span>
-        </div>
-        <div className={`image-viewport ${view === 'compare' ? 'comparison' : ''}`}>
-          <div className="image-inner" style={{ width: `${zoom}%`, minWidth: `${zoom}%` }}>
-            {view === 'compare' && output ? (
-              <div
-                className="compare-frame"
-                style={{ aspectRatio: `${image.width} / ${image.height}` }}
-              >
-                <img src={image.url} alt="Original image" draggable={false} />
-                <div
-                  className="compare-overlay"
-                  style={{ clipPath: `inset(0 ${100 - split}% 0 0)` }}
+      <div className="workspace-body">
+        <div className="preview-container">
+          <div className="preview-topbar">
+            <div className="view-switch" role="group" aria-label="Preview mode">
+              {(['original', 'optimized', 'compare'] as const).map((v) => (
+                <button
+                  key={v}
+                  className={view === v ? 'selected' : ''}
+                  onClick={() => setView(v)}
+                  disabled={v !== 'original' && !output}
                 >
-                  <img src={output.url} alt="Optimized image" draggable={false} />
+                  {v[0].toUpperCase() + v.slice(1)}
+                  {v === 'optimized' && <span className="status-dot" />}
+                </button>
+              ))}
+            </div>
+            <span className="preview-status">
+              {processing ? (
+                <>
+                  <LoaderCircle size={13} className="spin" />
+                  Optimizing
+                </>
+              ) : (
+                <>
+                  <Check size={13} />
+                  Ready to go
+                </>
+              )}
+            </span>
+          </div>
+          <div className={`image-viewport ${view === 'compare' ? 'comparison' : ''}`}>
+            <div className="image-inner" style={{ width: `${zoom}%`, minWidth: `${zoom}%` }}>
+              {view === 'compare' && output ? (
+                <div
+                  className="compare-frame"
+                  style={{ aspectRatio: `${image.width} / ${image.height}` }}
+                >
+                  <img src={image.url} alt="Original image" draggable={false} />
+                  <div
+                    className="compare-overlay"
+                    style={{ clipPath: `inset(0 ${100 - split}% 0 0)` }}
+                  >
+                    <img src={output.url} alt="Optimized image" draggable={false} />
+                  </div>
+                  <span className="compare-line" style={{ left: `${split}%` }}>
+                    <span>‹ ›</span>
+                  </span>
+                  <span className="compare-tag left">Optimized</span>
+                  <span className="compare-tag right">Original</span>
+                  <input
+                    aria-label="Before and after comparison"
+                    className="comparison-range"
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={split}
+                    onChange={(e) => setSplit(+e.target.value)}
+                  />
                 </div>
-                <span className="compare-line" style={{ left: `${split}%` }}>
-                  <span>‹ ›</span>
-                </span>
-                <span className="compare-tag left">Optimized</span>
-                <span className="compare-tag right">Original</span>
-                <input
-                  aria-label="Before and after comparison"
-                  className="comparison-range"
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={split}
-                  onChange={(e) => setSplit(+e.target.value)}
+              ) : (
+                <img
+                  className="preview-image"
+                  src={view === 'original' ? image.url : output?.url || image.url}
+                  alt={view === 'original' ? 'Original uploaded image' : 'Optimized image preview'}
+                  draggable={false}
                 />
-              </div>
-            ) : (
-              <img
-                className="preview-image"
-                src={view === 'original' ? image.url : output?.url || image.url}
-                alt={view === 'original' ? 'Original uploaded image' : 'Optimized image preview'}
-                draggable={false}
-              />
-            )}
+              )}
+            </div>
+          </div>
+          {image.sample && (
+            <div className="sample-caption">
+              Meet your new favorite view.{' '}
+              <button onClick={onChoose}>
+                Try your own image <ArrowRight size={12} />
+              </button>
+            </div>
+          )}
+          <div className="preview-toolbar">
+            <div className="button-group">
+              <button
+                className="icon-button"
+                aria-label="Undo"
+                title="Undo (⌘/Ctrl Z)"
+                disabled={!editor.canUndo}
+                onClick={editor.undo}
+              >
+                <Undo2 size={17} />
+              </button>
+              <button
+                className="icon-button"
+                aria-label="Redo"
+                title="Redo (⌘/Ctrl Shift Z)"
+                disabled={!editor.canRedo}
+                onClick={editor.redo}
+              >
+                <Redo2 size={17} />
+              </button>
+              <span className="toolbar-divider" />
+              <button
+                className="icon-button"
+                aria-label="Rotate image left"
+                title="Rotate left"
+                onClick={() =>
+                  editor.update({
+                    rotation: (settings.rotation + 270) % 360,
+                    width: settings.height,
+                    height: settings.width,
+                  })
+                }
+              >
+                <RotateCcw size={16} />
+              </button>
+              <button
+                className="icon-button"
+                aria-label="Rotate image right"
+                title="Rotate right"
+                onClick={() =>
+                  editor.update({
+                    rotation: (settings.rotation + 90) % 360,
+                    width: settings.height,
+                    height: settings.width,
+                  })
+                }
+              >
+                <RotateCw size={16} />
+              </button>
+            </div>
+            <div className="button-group zoom-tools">
+              <button
+                className="icon-button"
+                aria-label="Zoom preview out"
+                disabled={zoom <= 25}
+                onClick={() => setZoom((z) => Math.max(25, z - 25))}
+              >
+                <Minus size={16} />
+              </button>
+              <button
+                className="zoom-value"
+                title="Reset preview zoom"
+                onClick={() => setZoom(100)}
+              >
+                {zoom}%
+              </button>
+              <button
+                className="icon-button"
+                aria-label="Zoom preview in"
+                disabled={zoom >= 200}
+                onClick={() => setZoom((z) => Math.min(200, z + 25))}
+              >
+                <Plus size={16} />
+              </button>
+              <span className="toolbar-divider" />
+              <button
+                className="icon-button"
+                aria-label={expanded ? 'Close expanded preview' : 'Expand preview'}
+                title="Expand preview"
+                onClick={() => setExpanded((v) => !v)}
+              >
+                <Expand size={16} />
+              </button>
+            </div>
           </div>
         </div>
-        {image.sample && (
-          <div className="sample-caption">
-            Meet your new favorite view.{' '}
-            <button onClick={onChoose}>
-              Try your own image <ArrowRight size={12} />
-            </button>
+        <aside className="preview-sidebar" aria-label="Device preview and image statistics">
+          <DevicePreview
+            src={view === 'original' ? image.url : output?.url || image.url}
+            original={view === 'original' || !output}
+            processing={processing}
+          />
+          <div className="image-statistics">
+            <div className="image-stat">
+              <span className="stat-label">ORIGINAL</span>
+              <strong>
+                {formatBytes(image.originalSize ?? image.blob.size)}{' '}
+                <span>{extension(image.type).toUpperCase()}</span>
+              </strong>
+              <small>
+                {image.width.toLocaleString()} × {image.height.toLocaleString()} px
+              </small>
+            </div>
+            <span className="stat-arrow">
+              <ArrowRight size={20} />
+            </span>
+            <div className="image-stat">
+              <span className="stat-label">OPTIMIZED</span>
+              <strong>
+                {output ? formatBytes(output.blob.size) : '—'}{' '}
+                <span>{extension(settings.format).toUpperCase()}</span>
+              </strong>
+              <small>
+                {settings.width.toLocaleString()} × {settings.height.toLocaleString()} px
+              </small>
+            </div>
+            <div className={`savings ${saved < 0 ? 'larger' : ''}`}>
+              <span>
+                {processing ? (
+                  <LoaderCircle size={14} className="spin" />
+                ) : saved >= 0 ? (
+                  <ArrowDown size={14} />
+                ) : (
+                  <ArrowRight size={14} />
+                )}
+                {output
+                  ? `${Math.abs(saved).toFixed(1)}% ${saved >= 0 ? 'smaller' : 'larger'}`
+                  : 'Preparing…'}
+              </span>
+              <small>
+                {saved >= 0 ? 'A lighter image. A faster web.' : 'Try WebP or lower dimensions.'}
+              </small>
+            </div>
           </div>
-        )}
-        <div className="preview-toolbar">
-          <div className="button-group">
-            <button
-              className="icon-button"
-              aria-label="Undo"
-              title="Undo (⌘/Ctrl Z)"
-              disabled={!editor.canUndo}
-              onClick={editor.undo}
-            >
-              <Undo2 size={17} />
-            </button>
-            <button
-              className="icon-button"
-              aria-label="Redo"
-              title="Redo (⌘/Ctrl Shift Z)"
-              disabled={!editor.canRedo}
-              onClick={editor.redo}
-            >
-              <Redo2 size={17} />
-            </button>
-            <span className="toolbar-divider" />
-            <button
-              className="icon-button"
-              aria-label="Rotate image left"
-              title="Rotate left"
-              onClick={() =>
-                editor.update({
-                  rotation: (settings.rotation + 270) % 360,
-                  width: settings.height,
-                  height: settings.width,
-                })
-              }
-            >
-              <RotateCcw size={16} />
-            </button>
-            <button
-              className="icon-button"
-              aria-label="Rotate image right"
-              title="Rotate right"
-              onClick={() =>
-                editor.update({
-                  rotation: (settings.rotation + 90) % 360,
-                  width: settings.height,
-                  height: settings.width,
-                })
-              }
-            >
-              <RotateCw size={16} />
-            </button>
-          </div>
-          <div className="button-group zoom-tools">
-            <button
-              className="icon-button"
-              aria-label="Zoom preview out"
-              disabled={zoom <= 25}
-              onClick={() => setZoom((z) => Math.max(25, z - 25))}
-            >
-              <Minus size={16} />
-            </button>
-            <button className="zoom-value" title="Reset preview zoom" onClick={() => setZoom(100)}>
-              {zoom}%
-            </button>
-            <button
-              className="icon-button"
-              aria-label="Zoom preview in"
-              disabled={zoom >= 200}
-              onClick={() => setZoom((z) => Math.min(200, z + 25))}
-            >
-              <Plus size={16} />
-            </button>
-            <span className="toolbar-divider" />
-            <button
-              className="icon-button"
-              aria-label={expanded ? 'Close expanded preview' : 'Expand preview'}
-              title="Expand preview"
-              onClick={() => setExpanded((v) => !v)}
-            >
-              <Expand size={16} />
-            </button>
-          </div>
-        </div>
-      </div>
-      <div className="image-statistics">
-        <div className="image-stat">
-          <span className="stat-label">ORIGINAL</span>
-          <strong>
-            {formatBytes(image.originalSize ?? image.blob.size)}{' '}
-            <span>{extension(image.type).toUpperCase()}</span>
-          </strong>
-          <small>
-            {image.width.toLocaleString()} × {image.height.toLocaleString()} px
-          </small>
-        </div>
-        <span className="stat-arrow">
-          <ArrowRight size={20} />
-        </span>
-        <div className="image-stat">
-          <span className="stat-label">OPTIMIZED</span>
-          <strong>
-            {output ? formatBytes(output.blob.size) : '—'}{' '}
-            <span>{extension(settings.format).toUpperCase()}</span>
-          </strong>
-          <small>
-            {settings.width.toLocaleString()} × {settings.height.toLocaleString()} px
-          </small>
-        </div>
-        <div className={`savings ${saved < 0 ? 'larger' : ''}`}>
-          <span>
-            {processing ? (
-              <LoaderCircle size={14} className="spin" />
-            ) : saved >= 0 ? (
-              <ArrowDown size={14} />
-            ) : (
-              <ArrowRight size={14} />
-            )}
-            {output
-              ? `${Math.abs(saved).toFixed(1)}% ${saved >= 0 ? 'smaller' : 'larger'}`
-              : 'Preparing…'}
-          </span>
-          <small>
-            {saved >= 0 ? 'A lighter image. A faster web.' : 'Try WebP or lower dimensions.'}
-          </small>
-        </div>
+        </aside>
       </div>
       <div className="workspace-bottom">
         <span>

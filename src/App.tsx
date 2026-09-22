@@ -30,6 +30,7 @@ import { DownloadCard, Workspace, downloadEditor } from './components/Workspace'
 import { Modal } from './components/Modal'
 import './styles/app.css'
 import './styles/theme.css'
+import './styles/device-preview.css'
 
 const CropEditor = lazy(() => import('./features/CropEditor'))
 const BatchOptimizer = lazy(() => import('./features/BatchOptimizer'))
@@ -46,13 +47,10 @@ function Brand() {
   return (
     <span className="brand">
       <span className="brand-mark" aria-hidden="true">
-        <i />
-        <i />
-        <i />
-        <i />
+        <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" width="40" height="40" />
       </span>
-      <span>
-        pixelwell<span className="brand-period">.</span>
+      <span className="brand-wordmark">
+        Pixel<span className="brand-change">Change</span>
       </span>
     </span>
   )
@@ -147,7 +145,7 @@ export default function App() {
         <div className="header-inner">
           <button
             className="brand-button"
-            aria-label="Pixelwell home"
+            aria-label="PixelChange home"
             onClick={() => setMode('editor')}
           >
             <Brand />
@@ -396,7 +394,7 @@ export default function App() {
             <BatchOptimizer formats={editor.formats} />
           </Suspense>
         )}
-        <section className="benefits" aria-label="Why Pixelwell">
+        <section className="benefits" aria-label="Why PixelChange">
           <div>
             <span className="benefit-icon lavender">
               <ShieldCheck size={21} strokeWidth={1.6} />
@@ -481,7 +479,7 @@ export default function App() {
               ? 'Your images are your business.'
               : dialog === 'help'
                 ? 'A few helpful little things.'
-                : 'Meet Pixelwell.'
+                : 'Meet PixelChange.'
           }
           onClose={() => setDialog(null)}
         >
@@ -581,8 +579,8 @@ export default function App() {
                   <Sparkles size={30} />
                 </span>
                 <p>
-                  Pixelwell is a small, thoughtful workspace for better images. Less file weight, a
-                  little more breathing room, and all the details that matter.
+                  PixelChange is a small, thoughtful workspace for better images. Less file weight,
+                  a little more breathing room, and all the details that matter.
                 </p>
                 <p>
                   Built around your browser, so your creative work stays on your device. Free to
