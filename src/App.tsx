@@ -536,9 +536,9 @@ export default function App() {
                 <p>
                   Use Convert to choose SVG or EPS artwork and an import resolution. Both support
                   the crop editor, resizing, adjustments, and watermarks. Export PNG, JPG, WebP, or
-                  AVIF where supported. Vector imports become pixels; exports do not retain editable
-                  vector paths. SVG must be static and self-contained. EPS fonts should be embedded;
-                  missing fonts may be substituted.
+                  AVIF. Vector imports become pixels; exports do not retain editable vector paths.
+                  SVG must be static and self-contained. EPS fonts should be embedded; missing fonts
+                  may be substituted.
                 </p>
                 <p>
                   EPS conversion uses Ghostscript locally.{' '}
@@ -565,8 +565,8 @@ export default function App() {
                   8,192 pixels per side and 24 megapixels.
                 </p>
                 <p>
-                  PNG is lossless. WebP and AVIF exports depend on your browser’s encoder;
-                  unavailable formats are disabled. JPG and JPEG are the same format, exported with
+                  PNG is lossless. AVIF supports transparency and is encoded locally. WebP export
+                  depends on your browser’s encoder. JPG and JPEG are the same format, exported with
                   the .jpg extension.
                 </p>
                 <p>

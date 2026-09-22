@@ -80,6 +80,23 @@ export async function renderPixels(
   }
 }
 
+export async function encodeCanvas(
+  canvas: HTMLCanvasElement | OffscreenCanvas,
+  type: string,
+  quality: number,
+): Promise<Blob> {
+  if (type === 'image/avif') {
+    const ctx = canvas.getContext('2d') as
+      CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null
+    if (!ctx) throw new Error('Could not read image pixels for AVIF export.')
+    const { encodeAvif } = await import('./avif')
+    return encodeAvif(ctx.getImageData(0, 0, canvas.width, canvas.height), quality)
+  }
+  return 'convertToBlob' in canvas
+    ? canvas.convertToBlob({ type, quality })
+    : canvasBlob(canvas, type, quality)
+}
+
 export function canvasBlob(
   canvas: HTMLCanvasElement,
   type: string,

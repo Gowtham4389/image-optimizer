@@ -15,7 +15,7 @@ export default function VectorControls({ editor, onCrop }: { editor: Editor; onC
         <span>IMAGE</span>
       </div>
       <h4>Bring your vectors to life.</h4>
-      <p>Convert artwork to PNG, JPG, WebP, or supported AVIF. Crop it to the perfect frame.</p>
+      <p>Convert artwork to PNG, JPG, WebP, or AVIF. Crop it to the perfect frame.</p>
       <label htmlFor="vector-resolution">Import resolution</label>
       <select
         id="vector-resolution"

@@ -75,10 +75,14 @@ test('production assets, worker, crop chunk, and downloads work under a subdirec
     })
     await expect(page.locator('.file-title strong')).toHaveText('production.eps')
     await expect(page.locator('.vector-import-details')).toContainText('200 × 120 px')
+    await page.getByRole('button', { name: 'AVIF', exact: true }).click()
     await expect(page.getByRole('button', { name: /^Download image/ })).toBeEnabled()
     const converted = page.waitForEvent('download')
     await page.getByRole('button', { name: /^Download image/ }).click()
-    expect((await converted).suggestedFilename()).toContain('production-optimized')
+    const avif = await converted
+    expect(avif.suggestedFilename()).toBe('production-optimized.avif')
+    const bytes = await readFile((await avif.path())!)
+    expect(bytes.toString('ascii', 4, 12)).toBe('ftypavif')
     expect(failed).toEqual([])
   } finally {
     await new Promise<void>((resolve, reject) =>

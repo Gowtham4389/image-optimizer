@@ -78,7 +78,7 @@ export const FORMATS: { value: Format; label: string; description: string }[] = 
   {
     value: 'image/avif',
     label: 'AVIF',
-    description: 'Next-generation compression, when your browser supports it.',
+    description: 'Next-generation compression with transparency support.',
   },
 ]
 export const ACCEPT =

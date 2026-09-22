@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@bentopdf/gs-wasm": "0.1.1",
+    "@jsquash/avif": "2.1.1",
     "cropperjs": "1.6.2",
     "fflate": "^0.8.2",
     "lucide-react": "^0.468.0",

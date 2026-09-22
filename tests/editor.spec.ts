@@ -63,17 +63,7 @@ test('sample, real export, format detection, and private processing', async ({ p
   page.on('pageerror', (e) => errors.push(e.message))
   await ready(page)
   await expect(page.getByRole('heading', { level: 1 })).toContainText('A little lighter.')
-  const canEncodeAvif = await page.evaluate(async () => {
-    const canvas = document.createElement('canvas')
-    canvas.width = 2
-    canvas.height = 2
-    return new Promise<boolean>((resolve) =>
-      canvas.toBlob((blob) => resolve(blob?.type === 'image/avif'), 'image/avif'),
-    )
-  })
-  expect(await page.getByRole('button', { name: 'AVIF', exact: true }).isEnabled()).toBe(
-    canEncodeAvif,
-  )
+  await expect(page.getByRole('button', { name: 'AVIF', exact: true })).toBeEnabled()
   const download = await save(page)
   expect(download.suggestedFilename()).toMatch(/alpine-escape-optimized\.(webp|png|jpg)$/)
   const decoded = await pixels(page, (await download.path())!)
@@ -82,6 +72,32 @@ test('sample, real export, format detection, and private processing', async ({ p
   expect(imageUploads).toEqual([])
   expect(errors).toEqual([])
 })
+
+for (const fallback of [false, true]) {
+  test(`AVIF export preserves dimensions and transparency (${fallback ? 'fallback' : 'worker'})`, async ({
+    page,
+  }) => {
+    if (fallback) {
+      await page.addInitScript(() => {
+        Object.defineProperty(window, 'OffscreenCanvas', { value: undefined })
+      })
+    }
+    await ready(page)
+    await uploadTransparent(page)
+    await page.getByRole('tab', { name: 'Convert', exact: true }).click()
+    await page.getByRole('button', { name: 'AVIF', exact: true }).click()
+    await expect(page.getByRole('button', { name: /^Download image/ })).toBeEnabled()
+    const downloaded = await save(page)
+    expect(downloaded.suggestedFilename()).toBe('transparent-optimized.avif')
+    const filePath = (await downloaded.path())!
+    const bytes = await readFile(filePath)
+    expect(bytes.toString('ascii', 4, 12)).toBe('ftypavif')
+    const decoded = await pixels(page, filePath)
+    expect(decoded).toMatchObject({ width: 120, height: 80 })
+    expect(decoded.color[3]).toBe(0)
+    await expect(page.getByRole('alert')).toHaveCount(0)
+  })
+}
 
 test('resize preserves proportions, undo/redo and customizable filename', async ({ page }) => {
   await ready(page)
@@ -167,6 +183,7 @@ test('batch outputs and ZIP with duplicate filenames', async ({ page }) => {
     ])
   await expect(page.locator('.batch-item')).toHaveCount(2)
   await page.getByRole('spinbutton', { name: 'Max width' }).fill('400')
+  await page.getByRole('button', { name: 'AVIF', exact: true }).click()
   await page.getByRole('button', { name: 'Optimize all images' }).click()
   await expect(page.getByText('2 of 2 images optimized')).toBeVisible()
   const dl = page.waitForEvent('download')
@@ -177,6 +194,10 @@ test('batch outputs and ZIP with duplicate filenames', async ({ page }) => {
   const zip = unzipSync(new Uint8Array(await readFile((await downloaded.path())!)))
   expect(Object.keys(zip)).toHaveLength(2)
   expect(Object.keys(zip).some((key) => key.includes('-2.'))).toBeTruthy()
+  for (const [name, data] of Object.entries(zip)) {
+    expect(name).toMatch(/\.avif$/)
+    expect(Buffer.from(data).toString('ascii', 4, 12)).toBe('ftypavif')
+  }
   await page.getByRole('button', { name: 'Clear all' }).click()
   await expect(page.locator('.batch-item')).toHaveCount(0)
 })

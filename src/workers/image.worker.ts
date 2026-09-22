@@ -1,4 +1,4 @@
-import { renderPixels } from '../utils/render'
+import { encodeCanvas, renderPixels } from '../utils/render'
 import type { RenderRequest } from '../types'
 
 self.onmessage = async (event: MessageEvent<RenderRequest>) => {
@@ -13,7 +13,7 @@ self.onmessage = async (event: MessageEvent<RenderRequest>) => {
       watermarkImage = await createImageBitmap(s.watermark.image.blob)
     }
     await renderPixels(bitmap, bitmap.width, bitmap.height, canvas, s, false, watermarkImage)
-    const blob = await canvas.convertToBlob({ type: s.format, quality: s.quality / 100 })
+    const blob = await encodeCanvas(canvas, s.format, s.quality / 100)
     self.postMessage({ blob })
   } catch {
     self.postMessage({ failed: true })

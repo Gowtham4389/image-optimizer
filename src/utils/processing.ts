@@ -1,6 +1,6 @@
 import type { Format, RenderRequest, Settings, UploadedImage } from '../types'
 import { loadHtmlImage } from './files'
-import { canvasBlob, renderPixels, validateDimensions } from './render'
+import { canvasBlob, encodeCanvas, renderPixels, validateDimensions } from './render'
 import { preserveExif } from './metadata'
 
 export function initialSettings(source: UploadedImage, formats: Format[]): Settings {
@@ -48,7 +48,8 @@ export async function detectFormats(): Promise<Format[]> {
   canvas.width = 2
   canvas.height = 2
   const formats: Format[] = ['image/jpeg', 'image/png']
-  for (const format of ['image/webp', 'image/avif'] as Format[]) {
+  if (typeof WebAssembly !== 'undefined') formats.push('image/avif')
+  for (const format of ['image/webp'] as Format[]) {
     try {
       const blob = await canvasBlob(canvas, format, 0.9)
       if (blob.type === format) formats.push(format)
@@ -139,7 +140,7 @@ export async function processImage(
         true,
         watermarkImage,
       )
-      blob = await canvasBlob(canvas, settings.format, settings.quality / 100)
+      blob = await encodeCanvas(canvas, settings.format, settings.quality / 100)
     } finally {
       if (watermarkUrl) URL.revokeObjectURL(watermarkUrl)
       canvas.width = 1
